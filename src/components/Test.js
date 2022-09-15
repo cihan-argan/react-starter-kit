@@ -21,9 +21,9 @@ export default function Test() {
       .then((res) => res.json())
       .then((data) => setPost(data));
   }, [postId]);
-    // useEffect(() => {
-    //   console.log("component render oldu");
-    //  });
+  // useEffect(() => {
+  //   console.log("component render oldu");
+  //  });
 
   return (
     <div>

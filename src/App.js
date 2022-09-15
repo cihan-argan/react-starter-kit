@@ -71,16 +71,114 @@
 
 // export default App;
 
-import Test from "./components/Test";
-import { useState } from "react";
+//Konu 2
+// import Test from "./components/Test";
+// import { useState } from "react";
+// function App() {
+//   const [show, setShow] = useState(false);
+//   return (
+//     <>
+//       <button onClick={() => setShow((show) => !show)}>
+//         {show ? "Gizli" : "Göster"}
+//       </button>
+//       {show && <Test />}
+//     </>
+//   );
+// }
+// export default App;
+
+//Konu 3
+// import { forwardRef, useRef } from "react";
+// const Input = forwardRef((props, ref) => {
+//   return <input ref={ref} type="text" {...props} />;
+// });
+
+// function App() {
+//   const inputRef = useRef();
+//   const focusInput = () => {
+//     console.log(inputRef.current);
+//     inputRef.current.focus();
+//   };
+//   return (
+//     <>
+//       <h1>useRef - forwardRef </h1>
+//       <input type="text" ref={inputRef} />
+//       <button onClick={focusInput}>Focusla</button>
+//       <div>
+//         <Input ref={inputRef} />
+//         <button onClick={focusInput}>Focusla2</button>
+//       </div>
+//     </>
+//   );
+// }
+// export default App;
+
+import { useReducer, useState, useCallback, useMemo } from "react";
+import TodoReducer from "../src/reducers/TodoReducer";
+import AddToDo from "./components/AddToDo";
+import Header from "./components/Header";
+import Todos from "./components/Todos";
 function App() {
-  const [show, setShow] = useState(false);
+  const [count, setCount] = useState(0);
+  console.log("App Rendered");
+  const [state, dispatch] = useReducer(TodoReducer, {
+    todos: [],
+    todo: "",
+    search: "",
+  });
+  const submitHandle = useCallback(
+    (e) => {
+      e.preventDefault();
+      dispatch({
+        type: "ADD_TODO",
+        todo: state.todo,
+      });
+    },
+    [state.todo]
+  );
+
+  const onChange = useCallback((e) => {
+    //setTodo(e.target.value)
+    dispatch({
+      type: "SET_TODO",
+      value: e.target.value,
+    });
+  }, []);
+  const searchHandle = (e) => {
+    dispatch({
+      type: "SET_SEARCH",
+      value: e.target.value,
+    });
+  };
+
+  const filterTodos = useMemo(() => {
+    return state.todos.filter((todo) =>
+      todo
+        .toLocaleLowerCase("tr")
+        .includes(state.search.toLocaleLowerCase("tr"))
+    );
+  }, [state.todos, state.search]);
   return (
     <>
-      <button onClick={() => setShow((show) => !show)}>
-        {show ? "Gizli" : "Göster"}
-      </button>
-      {show && <Test />}
+      <Header />
+      <h3>{count}</h3>
+      <button onClick={() => setCount((count) => count + 1)}>Arttır</button>
+      <hr />
+      <h1>ToDo App</h1>
+      <input
+        type="text"
+        placeholder="Todolarda Ara "
+        onChange={searchHandle}
+        value={state.search}
+      />
+      {state.search}
+      <hr />
+      <AddToDo
+        onChange={onChange}
+        submitHandle={submitHandle}
+        todo={state.todo}
+      />
+      <Todos todos={filterTodos} />
     </>
   );
 }
